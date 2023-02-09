@@ -2,36 +2,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spa-dark
+  name: mongodb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: spa-dark
+      app: mongodb
   template:
     metadata:
       labels:
-        app: spa-dark
+        app: mongodb
     spec:
       containers:
-        - name: spa-dark
-          image: ghcr.io/f5devcentral/spa-demo-app-spa-dark:sha-033b779
+        - name: mongodb
+          image: mongo
           ports:
-            - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: spa-dark
-spec:
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
-      name: http
-  selector:
-    app: spa-dark
-
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mongo-initdb
+          configMap:
+            name: mongo-initdb
 ---
 apiVersion: v1
 kind: Service
@@ -162,7 +155,7 @@ kind: Deployment
 metadata:
   name: inventory
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: inventory
